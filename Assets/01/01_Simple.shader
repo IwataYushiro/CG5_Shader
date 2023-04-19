@@ -24,7 +24,7 @@ Shader "Unlit/01_Simple"									//シェーダ種類/シェーダ名
 			}
 
 			fixed4 flag(float4 i:SV_POSITION) : SV_TARGET	//画面描画用セマンティクス
-			{												//値の数　fixed < floot
+			{												//値の数　fixed < float
 				fixed4 o = _Color;							//変数Propertiesで値を決めた_Colorを代入
 				return o;
 			}
