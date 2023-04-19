@@ -2,7 +2,7 @@ Shader "Unlit/01_Simple"									//シェーダ種類/シェーダ名
 {
 	Properties
 	{
-		_Color("Color",Color) = (1,0.5,0,1)					//最後に ; は不要
+		_Color("Color",Color) = (1,0,0,1)					//最後に ; は不要
 	}
 
 	SubShader												//実際のシェーダ、複数用意可能
