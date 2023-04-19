@@ -1,5 +1,10 @@
 Shader "Unlit/02_Lambert"
 {
+    Properties
+    {
+        _Color("BaseColor",Color) = (1,1,1,1)
+    }
+
     SubShader
     {
         Pass
@@ -8,12 +13,12 @@ Shader "Unlit/02_Lambert"
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            #include "Lighting.cginc"
+            #include "Lighting.cginc"                           //光源情報
 
-            struct appdata
+            struct appdata                                      //構造体
             {
-                float4 vertex : POSITION;
-                float3 normal : NORMAL;
+                float4 vertex : POSITION;                       //セマンティクスが必要
+                float3 normal : NORMAL;                         //法線用セマンティクス
             };
 
             struct v2f
@@ -22,7 +27,9 @@ Shader "Unlit/02_Lambert"
                 float3 normal : NORMAL;
             };
 
-            v2f vert(appdata v)
+            fixed4 _Color;
+
+            v2f vert(appdata v)                                 //引数や戻り値の構造体の中にセマンティクスが書かれているので関数部分には不要
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
@@ -34,7 +41,7 @@ Shader "Unlit/02_Lambert"
             {
                 float intensity = (dot(normalize(i.normal),_WorldSpaceLightPos0));
                 
-                fixed4 color = fixed4(1, 1, 1, 1);
+                fixed4 color = _Color;
                 fixed4 diffuse = color * intensity * _LightColor0;
 
                 return diffuse;
