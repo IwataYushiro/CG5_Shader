@@ -48,7 +48,7 @@ Shader "Unlit/22_toon"
 
 				float intensity = saturate(dot(normalize(i.normal), _WorldSpaceLightPos0));
 				fixed4 diffuseColor = _DiffuseColor;
-				fixed4 diffuse = diffuseColor * smoothstep(0.3,0.35, intensity) *_LightColor0;
+				fixed4 diffuse = smoothstep(0.3,0.35, diffuseColor * intensity * _LightColor0);
 
 				float3 eyeDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPosition);
 				float3 lightDir = normalize(_WorldSpaceLightPos0);
