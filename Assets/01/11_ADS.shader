@@ -44,7 +44,7 @@ Shader "Unlit/11_ADS"
 			{
 				fixed4 ambient = _AmbientColor;
 
-				float intensity = (dot(normalize(i.normal), _WorldSpaceLightPos0));
+				float intensity = saturate(dot(normalize(i.normal), _WorldSpaceLightPos0));
 				fixed4 diffuseColor = _DiffuseColor;
 				fixed4 diffuse = diffuseColor * intensity * _LightColor0;
 

@@ -39,7 +39,7 @@ Shader "Unlit/02_Lambert"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float intensity = (dot(normalize(i.normal),_WorldSpaceLightPos0));
+                float intensity = saturate(dot(normalize(i.normal),_WorldSpaceLightPos0));
                 
                 fixed4 color = _Color;
                 fixed4 diffuse = color * intensity * _LightColor0;
