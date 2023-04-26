@@ -27,6 +27,7 @@ Shader "Unlit/21_Texture"
             };
 
             sampler2D _MainTex;
+            float4    _MainTex_ST;
 
             v2f vert (appdata v)
             {
@@ -36,9 +37,11 @@ Shader "Unlit/21_Texture"
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
-                fixed4 col = tex2D(_MainTex, i.uv);
+                float2 tiling = _MainTex_ST.xy;
+                float2 offset = _MainTex_ST.zw;
+                fixed4 col = tex2D(_MainTex, i.uv * tiling + offset);
                 return col;
             }
             ENDCG
