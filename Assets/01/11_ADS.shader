@@ -3,6 +3,7 @@ Shader "Unlit/11_ADS"
 	Properties
 	{
 		_AmbientColor("Ambient",Color) = (0.3,0,0,1)
+		_AmbientBright("Bright",Range(0,1.0)) = 0.2
 		_DiffuseColor("Diffuse",Color) = (0.3,0,0,1)
 	}
 		SubShader
@@ -29,6 +30,7 @@ Shader "Unlit/11_ADS"
 			};
 
 			fixed4 _AmbientColor;
+			float  _AmbientBright;
 			fixed4 _DiffuseColor;
 
 			v2f vert(appdata v)
@@ -42,7 +44,7 @@ Shader "Unlit/11_ADS"
 
 			fixed4 frag(v2f i) : SV_Target
 			{
-				fixed4 ambient = _AmbientColor;
+				fixed4 ambient = _AmbientColor * _AmbientBright;
 
 				float intensity = saturate(dot(normalize(i.normal), _WorldSpaceLightPos0));
 				fixed4 diffuseColor = _DiffuseColor;
