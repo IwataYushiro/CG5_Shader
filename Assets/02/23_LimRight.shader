@@ -1,4 +1,4 @@
-Shader "Unlit/22_toon"
+Shader "Unlit/23_LimRight"
 {
 	Properties
 	{
@@ -46,11 +46,12 @@ Shader "Unlit/22_toon"
 			{
 				fixed4 ambient = _AmbientColor * _AmbientBright;
 
-				float intensity = smoothstep(0.3,0.35, saturate(dot(normalize(i.normal), _WorldSpaceLightPos0)));
+				float intensity = saturate(dot(normalize(i.normal), _WorldSpaceLightPos0));
 				fixed4 diffuseColor = _DiffuseColor;
-				fixed4 diffuse = diffuseColor * intensity * _LightColor0;
+				fixed4 diffuse = smoothstep(0.3,0.35, diffuseColor * intensity * _LightColor0);
 
 				float3 eyeDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPosition);
+				
 				float3 lightDir = normalize(_WorldSpaceLightPos0);
 				i.normal = normalize(i.normal);
 				float3 reflectDir = -lightDir + 2 * i.normal * dot(i.normal, lightDir);
