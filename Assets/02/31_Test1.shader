@@ -1,58 +1,66 @@
 Shader "Unlit/31_Test1"
 {
-    Properties
-    {
-        _MainTex ("Texture", 2D) = "white" {}
-    }
-    SubShader
-    {
-        Tags { "RenderType"="Opaque" }
-        LOD 100
+	Properties
+	{
+		_AmbientColor("Ambient",Color) = (0.3,0,0,1)
+		_AmbientBright("Bright",Range(0,1.0)) = 0.2
+		_DiffuseColor("Diffuse",Color) = (0.3,0,0,1)
+	}
+		SubShader
+	{
+		Pass
+		{
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+			#include "UnityCG.cginc"
+			#include "Lighting.cginc"
 
-        Pass
-        {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
+			struct appdata
+			{
+				float4 vertex : POSITION;
+				float3 normal : NORMAL;
+			};
 
-            #include "UnityCG.cginc"
+			struct v2f
+			{
+				float4 vertex : SV_POSITION;
+				float3 normal : NORMAL;
+				float3 worldPosition : TEXCOORD1;   //ワールド座標用に変数追加
+			};
 
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
+			fixed4 _AmbientColor;
+			float  _AmbientBright;
+			fixed4 _DiffuseColor;
 
-            struct v2f
-            {
-                float2 uv : TEXCOORD0;
-                UNITY_FOG_COORDS(1)
-                float4 vertex : SV_POSITION;
-            };
+			v2f vert(appdata v)
+			{
+				v2f o;
+				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.normal = UnityObjectToWorldNormal(v.normal);
+				o.worldPosition = mul(unity_ObjectToWorld, v.vertex);
+				return o;
+			}
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
+			fixed4 frag(v2f i) : SV_Target
+			{
+				fixed4 ambient = _AmbientColor * _AmbientBright;
 
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
-                return o;
-            }
+				float intensity = smoothstep(0.3,0.35, saturate(dot(normalize(i.normal), _WorldSpaceLightPos0)));
+				fixed4 diffuseColor = _DiffuseColor;
+				fixed4 diffuse = diffuseColor * intensity * _LightColor0;
 
-            fixed4 frag (v2f i) : SV_Target
-            {
-                // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
-                // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
-                return col;
-            }
-            ENDCG
-        }
-    }
+				float3 eyeDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPosition);
+				float3 lightDir = normalize(_WorldSpaceLightPos0);
+				i.normal = normalize(i.normal);
+				float3 reflectDir = -lightDir + 2 * i.normal * dot(i.normal, lightDir);
+				fixed4 specular = pow(saturate(dot(reflectDir, eyeDir)), 20) * _LightColor0;
+
+				fixed4 ads = ambient + diffuse + specular;
+				return ads;
+			}
+			ENDCG
+		}
+	}
 }
+
