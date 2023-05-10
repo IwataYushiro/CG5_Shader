@@ -2,6 +2,7 @@ Shader "Unlit/31_Test1"
 {
 	Properties
 	{
+		_MainTex("Texture", 2D) = "white" {}
 		_AmbientColor("Ambient",Color) = (0.3,0,0,1)
 		_AmbientBright("Bright",Range(0,1.0)) = 0.2
 		_DiffuseColor("Diffuse",Color) = (0.3,0,0,1)
@@ -20,6 +21,7 @@ Shader "Unlit/31_Test1"
 			{
 				float4 vertex : POSITION;
 				float3 normal : NORMAL;
+				float2 uv : TEXCOORD0;
 			};
 
 			struct v2f
@@ -27,11 +29,14 @@ Shader "Unlit/31_Test1"
 				float4 vertex : SV_POSITION;
 				float3 normal : NORMAL;
 				float3 worldPosition : TEXCOORD1;   //ワールド座標用に変数追加
+				float2 uv : TEXCOORD0;
 			};
 
 			fixed4 _AmbientColor;
 			float  _AmbientBright;
 			fixed4 _DiffuseColor;
+			sampler2D _MainTex;
+			float4    _MainTex_ST;
 
 			v2f vert(appdata v)
 			{
@@ -39,6 +44,7 @@ Shader "Unlit/31_Test1"
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.normal = UnityObjectToWorldNormal(v.normal);
 				o.worldPosition = mul(unity_ObjectToWorld, v.vertex);
+				o.uv = v.uv;
 				return o;
 			}
 
@@ -57,7 +63,12 @@ Shader "Unlit/31_Test1"
 				fixed4 specular = pow(saturate(dot(reflectDir, eyeDir)), 20) * _LightColor0;
 
 				fixed4 ads = ambient + diffuse + specular;
-				return ads;
+			
+				float2 tiling = _MainTex_ST.xy;
+				float2 offset = _MainTex_ST.zw;
+				fixed4 col = tex2D(_MainTex, i.uv * tiling + offset);
+
+				return ads + col;
 			}
 			ENDCG
 		}
